@@ -93,7 +93,7 @@ for i, question in enumerate(questions):
     strongMatch = []
     count = 0
     # perform the google search query
-    for j in search(query, tld="co.in", num=100, stop=100, pause=2):
+    for j in search(query, tld="co.in", num=5, stop=5, pause=2):
         # makes sure that only chegg sites get added
         if j[:len(baseurl)] == baseurl:
             hits.append(j)
