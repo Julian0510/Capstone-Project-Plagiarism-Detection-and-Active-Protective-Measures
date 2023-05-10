@@ -1,8 +1,8 @@
+# Levenshtein algorithm adapted from work done by Khoa Tran
 from Levenshtein import distance as levenshtein_distance
 import zipfile
 import re
 import pathlib
-
 
 # Java keywords list
 keywords_java = ["public", "void", "private", "boolean", "true",
@@ -16,7 +16,7 @@ keywords_java = ["public", "void", "private", "boolean", "true",
                  "volatile", "while"]
 
 # C++ keywords list
-# c++ keywords found here: https://en.cppreference.com/w/cpp/keyword
+# C++ keywords found here: https://en.cppreference.com/w/cpp/keyword
 keywords_cpp = ["alignas", "alignof", "and", "and_eq", "asm",
                 "atomic_cancel", "atomic_commit", "atomic_noexcept",
                 "auto", "bitland", "bitor", "bool", "break", "case",
@@ -34,13 +34,17 @@ keywords_cpp = ["alignas", "alignof", "and", "and_eq", "asm",
                 "typeid", "typename", "union", "unsigned", "using", "virtual", "void",
                 "volatile", "wchar_t", "while", "xor", "xor_eq"]
 
+# function that finds the file extension of passed in filename
+
 
 def fileExtensionFinder(filename):
     try:
         file_extension = pathlib.Path(filename).suffix
     except:
-        print("Error finding the fileextension")
+        print("Error finding the file extension")
     return file_extension
+
+# function that open and reads file
 
 
 def openFile(filename):
@@ -51,6 +55,8 @@ def openFile(filename):
         print("Unable to read file")
 
     return contents
+
+# the similarity checker function. cleans up the contents of the 2 inputed files and finds the Levenshtein distance to return a similarity score
 
 
 def similarityChecker(contents1, contents2, keywords):
@@ -64,6 +70,7 @@ def similarityChecker(contents1, contents2, keywords):
     contents2 = re.sub("/\\*.*?\\*/", "", contents2)
     contents2 = re.sub("/\\*\\*(?s:(?!\\*/).)*\\*/", "", contents2)
 
+    # split the contents of both files into arrays
     contentsArray = contents1.split()
     contentsArray2 = contents2.split()
 
@@ -79,14 +86,6 @@ def similarityChecker(contents1, contents2, keywords):
     # Remove whitespace and tabs
     contents1 = re.sub("\\s", "", contents1)
     contents2 = re.sub("\\s", "", contents2)
-
-    # # code for testing purposes
-    # print(name1, ":", contents1)
-    # print(name2, ":", contents2)
-    # with open("newfile.java", "w") as fp:
-    #     fp.writelines(contents1)
-    # with open("newfile2.java", "w") as fp:
-    #     fp.writelines(contents2)
 
     # Compute the Levenshtein distance
     similarityScore = abs((1 - levenshtein_distance(contents1,
@@ -109,14 +108,22 @@ def similarityChecker(contents1, contents2, keywords):
 
 # Driver code for testing the function
 
-# the name of the zipfile that has all of the homework solutions we will be comparing
-zipfile1 = "ElevenToothpicksSubmissions.zip"
+# reading the name of the zipfile and checking if it is a zipfile
+print("Please input the name of the zipfile: ")
 
+while True:
+    # the name of the zipfile that has all of the homework solutions we will be comparing
+    zipfile1 = input()
+    # if inputted file is a zip file we break out of loop and continue
+    if zipfile.is_zipfile(zipfile1):
+        break
+    else:
+        print("inputed file is NOT a zip file. Please enter the name of a zip file")
 
 # reading the contents of zipfile1
 with zipfile.ZipFile(zipfile1, "r") as thezip:
     files = thezip.namelist()
-
+    # 2D array that contains all of the info within the main zipfile
     all_info = []
     for file in files:
         temp_info = []
@@ -137,17 +144,15 @@ with zipfile.ZipFile(zipfile1, "r") as thezip:
 
         all_info.append(temp_info)
 
-# # for testing
-# for i in range(0, len(all_info)):
-#     print(all_info[i][0])  # filenames should be printed
-
-
+# 3D array where the similarity scores will be held
 similarityScores = []
-
+# looping through the contents of the zip file and comparing each solution with one another
 for i in range(0, len(all_info)):
+    # the target file whose contents will be compared with all of the other file contents (will loop each file will eventually become the target)
     target_file = all_info[i]
     file_extension1 = all_info[i][2]
     contents1 = all_info[i][1]
+    # 2D array that holds all of the similarity scores associated with the target_file
     simiScores_main = []
     simiScores_main.append(all_info[i][0])
     for k in range(0, len(all_info)):
@@ -158,6 +163,8 @@ for i in range(0, len(all_info)):
             file_extension2 = all_info[k][2]
 
             if file_extension1 == file_extension2:
+                # array that holds the similarity scores of target_file and contents_1
+                # appended at the end to simiScores_main
                 simiScores_temp = []
                 simiScores_temp.append(all_info[k][0])
 
@@ -182,7 +189,7 @@ for i in range(0, len(all_info)):
 
     similarityScores.append(simiScores_main)
 
-
+# printing out the results to the console
 for i in range(0, len(similarityScores)):
     print("Here is a list of files that were flagged as similar to",
           similarityScores[i][0], ":")
