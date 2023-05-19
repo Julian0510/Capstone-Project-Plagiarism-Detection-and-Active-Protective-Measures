@@ -3,7 +3,7 @@ Similarity Checker that reads in a zybooks zipfile and returns which files are s
 Developed for CSUMB Spring 2023 Capstone project Plagiarism Detection and Active Protective Measures.
 
 # System pre-specifications
-All your computer needs to be able to do is run the latest version of Python. The imports used by the program should already be built in.
+All your computer needs to be able to do is run the latest version of Python. You also need to be able to run the Levenshtein python modules so if you don't have that installed yet use ```pip install levenshtein``` to install it. The rest of the imports used by the program should already be built in.
 
  # How it works
  When you start the program it will run in the console and ask for the name of the zipfile that contains the solution files you would like to compare
